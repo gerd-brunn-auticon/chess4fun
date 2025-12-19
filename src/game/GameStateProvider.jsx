@@ -36,6 +36,12 @@ export default function GameStateProvider({ children }) {
     const [aiMoveDescription, setAiMoveDescription] = useState('');
     const [stockfishReady, setStockfishReady] = useState(false);
 
+    // AI Difficulty: 'standard' (5) or 'master' (20)
+    const [aiDifficulty, setAiDifficulty] = useState('standard');
+
+    // Audio Context Ref (Single instance)
+    const audioContextRef = useRef(null);
+
     // Game timer
     const [gameStartTime, setGameStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
@@ -124,7 +130,6 @@ export default function GameStateProvider({ children }) {
             stockfish.current = worker;
 
             // Init UCI
-            worker.postMessage('uci');
             worker.postMessage('setoption name Skill Level value 10');
             worker.postMessage('isready');
 
@@ -137,8 +142,6 @@ export default function GameStateProvider({ children }) {
             if (stockfish.current) stockfish.current.terminate();
         };
     }, []);
-
-    // AI Turn Logic
     useEffect(() => {
         if (gamePhase === 'playing' && !isGameOver && turn !== playerColor) {
             // AI Turn
@@ -222,28 +225,24 @@ export default function GameStateProvider({ children }) {
         setGameStatus('in_progress');
     }, []);
 
-    const startGame = (color) => {
-        setPlayerColor(color);
-        setIsBoardRotated(color === 'b');
-        setGamePhase('playing');
-        setGameStartTime(Date.now());
-        setElapsedTime(0);
-        resetGame();
-    };
+    const initializeAudio = useCallback(() => {
+        if (!audioContextRef.current) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                audioContextRef.current = new AudioContext();
+            }
+        }
+        // Resume if suspended (browser autoplay policy)
+        if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            audioContextRef.current.resume();
+        }
+    }, []);
 
     const playSound = useCallback((type) => {
-        if (!soundEnabled.current) return;
-
-        console.log('Playing sound:', type);
+        if (!soundEnabled.current || !audioContextRef.current) return;
 
         try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContext) {
-                console.warn('AudioContext not supported');
-                return;
-            }
-
-            const ctx = new AudioContext();
+            const ctx = audioContextRef.current;
             const oscillator = ctx.createOscillator();
             const gainNode = ctx.createGain();
 
@@ -275,12 +274,39 @@ export default function GameStateProvider({ children }) {
             oscillator.start(now);
             oscillator.stop(now + 0.12);
 
-            // Clean up
-            setTimeout(() => ctx.close(), 300);
         } catch (e) {
             console.warn('Sound error:', e);
         }
     }, []);
+
+    const startGame = useCallback((startColor, difficulty = 'standard') => {
+        initializeAudio(); // Important: call this on user interaction
+
+        const newGame = new Chess();
+        setGame(newGame);
+        setFen(newGame.fen());
+        setHistory([]);
+        setTurn('w'); // White always starts
+        setIsGameOver(false);
+        setGameStatus('in_progress');
+
+        // Setup functionality
+        setPlayerColor(startColor);
+        setIsBoardRotated(startColor === 'b');
+        setGamePhase('playing');
+
+        // Timer reset
+        setGameStartTime(Date.now());
+        setElapsedTime(0);
+
+        // Set AI Difficulty
+        setAiDifficulty(difficulty);
+        if (stockfish.current) {
+            const skillLevel = difficulty === 'master' ? 20 : 5; // 5 is good for casual, 20 is max
+            console.log(`Setting Stockfish Skill Level to ${skillLevel} (${difficulty})`);
+            stockfish.current.postMessage(`setoption name Skill Level value ${skillLevel}`);
+        }
+    }, [initializeAudio]);
 
 
     const makeMove = useCallback((move) => {

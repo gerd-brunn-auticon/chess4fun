@@ -29,15 +29,37 @@ export default function UIOverlay() {
         return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
+    // Local state for difficulty
+    const [selectedDifficulty, setSelectedDifficulty] = useState('standard');
+
     if (gamePhase === 'start') {
         return (
             <div className="ui-overlay start-screen-container">
                 <div className="start-card">
                     <h1>Chess4fun</h1>
+
+                    <div className="difficulty-section">
+                        <p>Select Difficulty</p>
+                        <div className="difficulty-toggle">
+                            <button
+                                className={selectedDifficulty === 'standard' ? 'active' : ''}
+                                onClick={() => setSelectedDifficulty('standard')}
+                            >
+                                Standard (Mid)
+                            </button>
+                            <button
+                                className={selectedDifficulty === 'master' ? 'active' : ''}
+                                onClick={() => setSelectedDifficulty('master')}
+                            >
+                                Master (Adv)
+                            </button>
+                        </div>
+                    </div>
+
                     <p>Choose your side</p>
                     <div className="start-buttons">
-                        <button onClick={() => startGame('w')}>Play as White</button>
-                        <button onClick={() => startGame('b')}>Play as Black (AI)</button>
+                        <button onClick={() => startGame('w', selectedDifficulty)}>Play as White</button>
+                        <button onClick={() => startGame('b', selectedDifficulty)}>Play as Black</button>
                     </div>
                 </div>
             </div>

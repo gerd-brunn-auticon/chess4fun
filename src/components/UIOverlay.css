@@ -13,7 +13,7 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 280px;
+    width: 220px;
     background: rgba(20, 20, 20, 0.85);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -223,6 +223,7 @@
     pointer-events: auto;
     align-items: center;
     justify-content: center;
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     display: flex;
 }
@@ -257,6 +258,42 @@
     justify-content: center;
 }
 
+/* Difficulty Selection */
+.difficulty-section {
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 24px;
+}
+
+.difficulty-toggle {
+    display: inline-flex;
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.difficulty-toggle button {
+    background: transparent;
+    border: none;
+    color: #888;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.difficulty-toggle button:hover {
+    color: #fff;
+}
+
+.difficulty-toggle button.active {
+    background: #4dabf7;
+    color: #111;
+    font-weight: 600;
+}
+
 .start-buttons button {
     padding: 12px 24px;
     font-size: 1rem;
@@ -276,4 +313,28 @@
 
 .start-buttons button:active {
     transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .info-panel {
+        top: auto;
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        padding: 12px;
+        max-height: 30vh;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .start-card {
+        padding: 20px;
+        width: 90%;
+    }
+
+    .start-buttons {
+        flex-direction: column;
+    }
 }
