@@ -50,8 +50,8 @@ export function createMarbleTexture(isDark) {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Base colors - MUCH darker for black squares
-    const baseColor = isDark ? '#050505' : '#f0f0e8';
+    // Base colors - VERY dark for black squares
+    const baseColor = isDark ? '#020202' : '#f0f0e8';
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 512, 512);
