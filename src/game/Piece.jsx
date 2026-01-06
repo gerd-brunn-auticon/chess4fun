@@ -126,26 +126,40 @@ function MinimalPiece({ type, materialProps }) {
 }
 
 // --- New "Classic" Lathe Geometry ---
-function ClassicPiece({ type, materialProps }) {
+function ClassicPiece({ type, materialProps, color }) {
     const points = useMemo(() => getPieceProfile(type), [type]);
+    const isWhite = color === 'w';
 
-    // Construct Knight Shape (Horse Head) - improved upright posture
+    // Construct Knight Shape (Horse Head) - Better Profile
     const knightShape = useMemo(() => {
         if (type !== 'n') return null;
         const s = new THREE.Shape();
-        // Upright Profile
-        s.moveTo(0, 0);
-        s.lineTo(0.2, 0);
-        s.lineTo(0.25, 0.3);  // Chest
-        s.lineTo(0.28, 0.5);  // Throttle
-        s.lineTo(0.35, 0.4);  // Jaw
-        s.lineTo(0.38, 0.42); // Snout bottom
-        s.lineTo(0.38, 0.52); // Snout tip
+
+        // Draw profile facing RIGHT (+X) for now, will rotate to face Z
+        // Center X around 0 for balance
+
+        // Base of Neck
+        s.moveTo(-0.15, 0);
+        s.lineTo(0.15, 0);
+
+        // Front of Chest/Neck (Curving up and right)
+        s.bezierCurveTo(0.25, 0.1, 0.25, 0.3, 0.2, 0.45); // Throat
+
+        // Jaw/Snout
+        s.lineTo(0.35, 0.35); // Chin
+        s.lineTo(0.38, 0.38); // Nose bottom
+        s.lineTo(0.38, 0.48); // Nose top
+        s.lineTo(0.28, 0.60); // Bridge
         s.lineTo(0.25, 0.65); // Forehead
-        s.lineTo(0.22, 0.75); // Ear front
-        s.lineTo(0.15, 0.72); // Ear top
-        s.lineTo(0.1, 0.65);  // Mane top
-        s.quadraticCurveTo(-0.05, 0.3, 0, 0); // Mane back
+
+        // Ears
+        s.lineTo(0.20, 0.75); // Ear Front
+        s.lineTo(0.12, 0.70); // Ear Back
+
+        // Mane/Back (Curving down and left)
+        s.bezierCurveTo(0.05, 0.6, -0.1, 0.5, -0.2, 0.2); // Mane
+
+        s.lineTo(-0.15, 0); // Close loop
         return s;
     }, [type]);
 
@@ -154,28 +168,53 @@ function ClassicPiece({ type, materialProps }) {
             steps: 2,
             depth: 0.12,
             bevelEnabled: true,
-            bevelThickness: 0.02,
+            bevelThickness: 0.03, // Softer edges
             bevelSize: 0.02,
-            bevelSegments: 3
+            bevelSegments: 4
         };
+
+        // Rotation logic:
+        // By default, shape is drawn in X/Y plane.
+        // We extrude in Z.
+        // We want the "Face" (Profile) to point towards enemy.
+        // The profile points +X.
+        // White starts at Z=7 (files). Needs to face -Z? No, Board Z mapping.
+        // Using `rotation` to orient the flat profile to face forward.
+        // A rotation of [0, Math.PI/2, 0] makes +X face +Z.
+
+        // Correct Rotation:
+        // White pieces (at bottom) should face UP (-Z usually? Board mapping).
+        // Black pieces (at top) should face DOWN (+Z).
+
+        // Let's assume standard board: White plays from Z=POSITIVE to Z=NEGATIVE.
+        // So White Knights should face -Z.
+        // Black Knights should face +Z.
+
+        const yRotation = isWhite ? Math.PI / 2 : -Math.PI / 2;
 
         return (
             <group position={[0, 0, 0]}>
                 {/* Standard Round Base */}
                 <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
-                    <cylinderGeometry args={[0.28, 0.32, 0.2, 32]} />
-                    <meshStandardMaterial {...materialProps} />
-                </mesh>
-                <mesh castShadow receiveShadow position={[0, 0.25, 0]}>
-                    <cylinderGeometry args={[0.22, 0.25, 0.1, 32]} />
+                    <cylinderGeometry args={[0.3, 0.35, 0.2, 32]} />
                     <meshStandardMaterial {...materialProps} />
                 </mesh>
 
                 {/* Extruded Horse Head */}
-                <mesh castShadow receiveShadow position={[0, 0.3, -0.06]} rotation={[0, 0, 0]}>
-                    <extrudeGeometry args={[knightShape, extrudeSettings]} />
-                    <meshStandardMaterial {...materialProps} />
-                </mesh>
+                {/* Center the extrusion thickness (Z) and adjust Y height */}
+                <group
+                    position={[0, 0.25, 0]}
+                    rotation={[0, yRotation, 0]}
+                >
+                    <mesh
+                        castShadow
+                        receiveShadow
+                        position={[0, 0, -0.06]} // Center the extrusion depth (0.12 / 2)
+                    >
+                        <extrudeGeometry args={[knightShape, extrudeSettings]} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                </group>
             </group>
         );
     }
@@ -183,18 +222,18 @@ function ClassicPiece({ type, materialProps }) {
     return (
         <group position={[0, 0, 0]}>
             <mesh castShadow receiveShadow>
-                <latheGeometry args={[points, 32]} /> {/* Higher resolution lathe */}
+                <latheGeometry args={[points, 48]} />
                 <meshStandardMaterial {...materialProps} />
             </mesh>
             {/* Special tops for King */}
             {type === 'k' && (
                 <group position={[0, 0.95, 0]}>
                     <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
-                        <boxGeometry args={[0.06, 0.25, 0.06]} /> {/* Taller Cross V */}
+                        <boxGeometry args={[0.08, 0.3, 0.08]} /> {/* Cross V */}
                         <meshStandardMaterial {...materialProps} />
                     </mesh>
-                    <mesh castShadow receiveShadow position={[0, 0.15, 0]}>
-                        <boxGeometry args={[0.18, 0.06, 0.06]} /> {/* Wider Cross H */}
+                    <mesh castShadow receiveShadow position={[0, 0.18, 0]}>
+                        <boxGeometry args={[0.22, 0.08, 0.08]} /> {/* Cross H */}
                         <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>

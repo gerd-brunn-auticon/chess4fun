@@ -46,3 +46,65 @@ export function createWoodTexture(isDark) {
     texture.wrapT = THREE.RepeatWrapping;
     return texture;
 }
+
+export function createMarbleTexture(isDark) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // Marble Colors (Black/White or Cream/Dark)
+    const baseColor = isDark ? '#202020' : '#f5f5f0';
+    const veinColor = isDark ? '#e0e0e0' : '#404040';
+
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // 1. Soft Cloud/Sponge Layer
+    for (let i = 0; i < 40; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const r = 50 + Math.random() * 150;
+
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)');
+        g.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = g;
+        ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+
+    // 2. Sharp Veins
+    ctx.strokeStyle = veinColor;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    const numVeins = 5;
+    for (let i = 0; i < numVeins; i++) {
+        ctx.globalAlpha = 0.2 + Math.random() * 0.3;
+        ctx.lineWidth = 1 + Math.random() * 2;
+
+        let x = Math.random() * 512;
+        let y = Math.random() * 512;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        const segments = 5 + Math.random() * 5;
+        for (let j = 0; j < segments; j++) {
+            const dx = (Math.random() - 0.5) * 300;
+            const dy = (Math.random() - 0.5) * 300;
+            const cp1x = x + (Math.random() - 0.5) * 100;
+            const cp1y = y + (Math.random() - 0.5) * 100;
+
+            x += dx;
+            y += dy;
+
+            ctx.quadraticCurveTo(cp1x, cp1y, x, y);
+        }
+        ctx.stroke();
+    }
+
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+}

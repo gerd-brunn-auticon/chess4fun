@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { Text } from '@react-three/drei';
-import { createWoodTexture } from './WoodTexture';
+import { createWoodTexture, createMarbleTexture } from './WoodTexture';
 
 export default function Board({ onSquareClick, selectedSquare, validMoves, lastMove, theme }) {
     const squares = [];
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const isClassic = theme === 'classic';
 
-    // Generate textures for classic mode only
-    const lightWood = useMemo(() => isClassic ? createWoodTexture(false) : null, [isClassic]);
-    const darkWood = useMemo(() => isClassic ? createWoodTexture(true) : null, [isClassic]);
+    // Generate marble textures for classic mode only (Board)
+    const lightMarble = useMemo(() => isClassic ? createMarbleTexture(false) : null, [isClassic]);
+    const darkMarble = useMemo(() => isClassic ? createMarbleTexture(true) : null, [isClassic]);
 
     // Create 64 squares
     // Board coordinate system: 
@@ -47,7 +47,7 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
                     isLastMove={isLastMove}
                     onClick={() => onSquareClick(squareName)}
                     theme={theme}
-                    woodTexture={isDark ? darkWood : lightWood}
+                    texture={isDark ? darkMarble : lightMarble}
                 />
             );
         }
@@ -57,20 +57,19 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
         <group>
             {squares}
             <BoardLabels files={files} />
-            <Border theme={theme} woodTexture={darkWood} />
+            <Border theme={theme} texture={darkMarble} />
         </group>
     );
 }
 
-function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick, theme, woodTexture }) {
+function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick, theme, texture }) {
     const isClassic = theme === 'classic';
 
     // Colors
-    // Minimal: Standard Brown/Beige (Back to original style)
-    // Classic: Richer Wood Tones
-    // Original colors (approx): Dark #5c4033, Light #deb887
-    const darkColor = isClassic ? '#6d4c41' : '#5c4033';
-    const lightColor = isClassic ? '#e6c9a8' : '#deb887';
+    // Minimal: Standard Brown/Beige 
+    // Classic: Marble Tones (Dark Grey / Cream)
+    const darkColor = isClassic ? '#404040' : '#5c4033';
+    const lightColor = isClassic ? '#f0f0f0' : '#deb887';
 
     // Highlight colors
     const darkSelected = '#b8860b';
@@ -98,12 +97,13 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 {isClassic ? (
                     <meshPhysicalMaterial
                         color={color}
-                        map={woodTexture}
-                        roughness={0.8} // Natural matte wood
-                        metalness={0.0}
-                        clearcoat={0.0}
-                        bumpMap={woodTexture}
-                        bumpScale={0.02}
+                        map={texture}
+                        roughness={0.2} // Polished Stone
+                        metalness={0.1}
+                        clearcoat={0.3} // Moderate polish
+                        clearcoatRoughness={0.2}
+                        bumpMap={texture}
+                        bumpScale={0.005} // Subtle texture
                     />
                 ) : (
                     <meshStandardMaterial color={color} roughness={0.7} />
@@ -204,20 +204,18 @@ function BoardLabels({ files }) {
     return <>{labels}</>;
 }
 
-function Border({ theme, woodTexture }) {
+function Border({ theme, texture }) {
     const isClassic = theme === 'classic';
     return (
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
             {isClassic ? (
                 <meshPhysicalMaterial
-                    color="#4a332a"
-                    map={woodTexture}
-                    roughness={0.9}
-                    metalness={0.0}
-                    clearcoat={0.0}
-                    bumpMap={woodTexture}
-                    bumpScale={0.02}
+                    color="#202020"
+                    map={texture}
+                    roughness={0.4}
+                    metalness={0.1}
+                    clearcoat={0.1}
                 />
             ) : (
                 <meshStandardMaterial color="#2d2d2d" roughness={0.9} />
