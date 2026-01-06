@@ -50,89 +50,126 @@ export function createMarbleTexture(isDark) {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Base colors - the texture itself provides the board square color
-    const baseColor = isDark ? '#1a1a1a' : '#f0f0e8';
+    // Base colors - MUCH darker for black squares
+    const baseColor = isDark ? '#050505' : '#f0f0e8';
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 512, 512);
 
-    // 1. Cloud/Sponge Layer - Creates depth variation
+    // 1. Cloud/Sponge Layer
     ctx.globalAlpha = 1.0;
-    for (let i = 0; i < 80; i++) {
-        const x = Math.random() * 512;
-        const y = Math.random() * 512;
-        const r = 20 + Math.random() * 80;
 
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        if (isDark) {
-            // Lighter patches on dark marble
-            g.addColorStop(0, 'rgba(100,100,100,0.3)');
-            g.addColorStop(0.5, 'rgba(60,60,60,0.2)');
+    if (isDark) {
+        // SUBTLE effect on black - just hints of grey
+        for (let i = 0; i < 30; i++) {
+            const x = Math.random() * 512;
+            const y = Math.random() * 512;
+            const r = 30 + Math.random() * 100;
+
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, 'rgba(40,40,40,0.15)'); // Very subtle
             g.addColorStop(1, 'transparent');
-        } else {
-            // Darker patches on light marble
-            g.addColorStop(0, 'rgba(180,175,165,0.4)');
-            g.addColorStop(0.5, 'rgba(200,195,185,0.3)');
-            g.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 512, 512);
         }
+    } else {
+        // VISIBLE effect on white - clear marble patterns
+        for (let i = 0; i < 60; i++) {
+            const x = Math.random() * 512;
+            const y = Math.random() * 512;
+            const r = 20 + Math.random() * 80;
 
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 512, 512);
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, 'rgba(200,195,185,0.5)'); // Visible beige/grey patches
+            g.addColorStop(0.5, 'rgba(220,215,205,0.3)');
+            g.addColorStop(1, 'transparent');
+
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, 512, 512);
+        }
     }
 
-    // 2. Strong Veins - Very visible
+    // 2. Veins
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
-    const numVeins = 12;
-    for (let i = 0; i < numVeins; i++) {
-        if (isDark) {
-            ctx.strokeStyle = '#808080'; // Grey veins on black
-        } else {
-            ctx.strokeStyle = '#a0a0a0'; // Grey veins on white
+    if (isDark) {
+        // Subtle grey veins on black
+        const numVeins = 6;
+        for (let i = 0; i < numVeins; i++) {
+            ctx.strokeStyle = '#303030';
+            ctx.globalAlpha = 0.4;
+            ctx.lineWidth = 1 + Math.random() * 2;
+
+            let x = Math.random() * 512;
+            let y = Math.random() * 512;
+
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+
+            const segments = 3 + Math.random() * 3;
+            for (let j = 0; j < segments; j++) {
+                const dx = (Math.random() - 0.5) * 180;
+                const dy = (Math.random() - 0.5) * 180;
+                const cp1x = x + (Math.random() - 0.5) * 50;
+                const cp1y = y + (Math.random() - 0.5) * 50;
+
+                x += dx;
+                y += dy;
+
+                ctx.quadraticCurveTo(cp1x, cp1y, x, y);
+            }
+            ctx.stroke();
         }
-        ctx.globalAlpha = isDark ? 0.7 : 0.5;
-        ctx.lineWidth = 1.5 + Math.random() * 4;
+    } else {
+        // Visible grey veins on white
+        const numVeins = 10;
+        for (let i = 0; i < numVeins; i++) {
+            ctx.strokeStyle = '#b0b0b0';
+            ctx.globalAlpha = 0.6;
+            ctx.lineWidth = 1.5 + Math.random() * 3;
 
-        let x = Math.random() * 512;
-        let y = Math.random() * 512;
+            let x = Math.random() * 512;
+            let y = Math.random() * 512;
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
 
-        const segments = 3 + Math.random() * 4;
-        for (let j = 0; j < segments; j++) {
-            const dx = (Math.random() - 0.5) * 200;
-            const dy = (Math.random() - 0.5) * 200;
-            const cp1x = x + (Math.random() - 0.5) * 60;
-            const cp1y = y + (Math.random() - 0.5) * 60;
+            const segments = 3 + Math.random() * 4;
+            for (let j = 0; j < segments; j++) {
+                const dx = (Math.random() - 0.5) * 200;
+                const dy = (Math.random() - 0.5) * 200;
+                const cp1x = x + (Math.random() - 0.5) * 60;
+                const cp1y = y + (Math.random() - 0.5) * 60;
 
-            x += dx;
-            y += dy;
+                x += dx;
+                y += dy;
 
-            ctx.quadraticCurveTo(cp1x, cp1y, x, y);
+                ctx.quadraticCurveTo(cp1x, cp1y, x, y);
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
-    }
 
-    // 3. Fine detail veins
-    for (let i = 0; i < 20; i++) {
-        ctx.strokeStyle = isDark ? '#505050' : '#c0c0c0';
-        ctx.globalAlpha = 0.4;
-        ctx.lineWidth = 0.5 + Math.random() * 1.5;
+        // Fine detail veins for white
+        for (let i = 0; i < 15; i++) {
+            ctx.strokeStyle = '#c8c8c8';
+            ctx.globalAlpha = 0.5;
+            ctx.lineWidth = 0.5 + Math.random() * 1;
 
-        let x = Math.random() * 512;
-        let y = Math.random() * 512;
+            let x = Math.random() * 512;
+            let y = Math.random() * 512;
 
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
 
-        for (let j = 0; j < 3; j++) {
-            x += (Math.random() - 0.5) * 100;
-            y += (Math.random() - 0.5) * 100;
-            ctx.lineTo(x, y);
+            for (let j = 0; j < 3; j++) {
+                x += (Math.random() - 0.5) * 80;
+                y += (Math.random() - 0.5) * 80;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
     }
 
     const texture = new THREE.CanvasTexture(canvas);
