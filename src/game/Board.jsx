@@ -84,7 +84,13 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 position={[0, -0.1, 0]}
             >
                 <boxGeometry args={[0.98, 0.2, 0.98]} />
-                <meshStandardMaterial color={color} roughness={0.5} metalness={0.1} />
+                <meshPhysicalMaterial
+                    color={color}
+                    roughness={0.2}
+                    metalness={0.05}
+                    clearcoat={1.0}
+                    clearcoatRoughness={0.15}
+                />
             </mesh>
 
             {/* Valid Move Indicator - Ring for captures, dot for normal moves */}
@@ -185,7 +191,13 @@ function Border() {
     return (
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
-            <meshStandardMaterial color="#3e2723" roughness={0.4} metalness={0.2} />
+            <meshPhysicalMaterial
+                color="#3e2723"
+                roughness={0.3}
+                metalness={0.1}
+                clearcoat={1.0}
+                clearcoatRoughness={0.2}
+            />
         </mesh>
     );
 }
