@@ -98,10 +98,10 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                     <meshPhysicalMaterial
                         color={color}
                         map={texture}
-                        roughness={0.2} // Polished Stone
+                        roughness={0.6} // Honed Stone
                         metalness={0.1}
-                        clearcoat={0.3} // Moderate polish
-                        clearcoatRoughness={0.2}
+                        clearcoat={0.0} // No Reflective Glare
+                        clearcoatRoughness={1.0}
                         bumpMap={texture}
                         bumpScale={0.005} // Subtle texture
                     />
@@ -213,9 +213,9 @@ function Border({ theme, texture }) {
                 <meshPhysicalMaterial
                     color="#202020"
                     map={texture}
-                    roughness={0.4}
+                    roughness={0.8}
                     metalness={0.1}
-                    clearcoat={0.1}
+                    clearcoat={0.0}
                 />
             ) : (
                 <meshStandardMaterial color="#2d2d2d" roughness={0.9} />

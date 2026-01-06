@@ -71,7 +71,7 @@ export default function UIOverlay() {
                                 className={selectedTheme === 'classic' ? 'active' : ''}
                                 onClick={() => setSelectedTheme('classic')}
                             >
-                                Classic Wood
+                                Classic
                             </button>
                         </div>
                     </div>

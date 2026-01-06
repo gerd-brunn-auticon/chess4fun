@@ -27,7 +27,7 @@ function Experience() {
 
     return (
         <>
-            <Environment preset="studio" />
+            <Environment preset="studio" blur={1} />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} castShadow />
             <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
