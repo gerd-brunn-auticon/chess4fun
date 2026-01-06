@@ -6,14 +6,12 @@ export function createWoodTexture(isDark) {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Base color
     const baseColor = isDark ? '#4a332a' : '#e6c9a8';
     const grainColor = isDark ? '#2e1e18' : '#dcb285';
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 512, 512);
 
-    // Draw wood grain
     ctx.fillStyle = grainColor;
     ctx.globalAlpha = 0.4;
 
@@ -32,7 +30,6 @@ export function createWoodTexture(isDark) {
         ctx.stroke();
     }
 
-    // Add noise
     for (let i = 0; i < 5000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
@@ -53,37 +50,42 @@ export function createMarbleTexture(isDark) {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Marble Colors (Deep Black / Off-White)
+    // Deep black base for dark, cream for light
     const baseColor = isDark ? '#000000' : '#f5f5f0';
-    const veinColor = isDark ? '#ffffff' : '#404040';
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 512, 512);
 
-    // 1. Soft Cloud/Sponge Layer
-    for (let i = 0; i < 40; i++) {
+    // 1. Cloud/Sponge Layer - VERY visible on black
+    ctx.globalAlpha = 1.0;
+    for (let i = 0; i < 60; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
-        const r = 50 + Math.random() * 150;
+        const r = 30 + Math.random() * 100;
 
         const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.03)');
-        g.addColorStop(1, 'transparent');
+        if (isDark) {
+            g.addColorStop(0, 'rgba(80,80,80,0.25)'); // Much more visible grey
+            g.addColorStop(1, 'transparent');
+        } else {
+            g.addColorStop(0, 'rgba(0,0,0,0.05)');
+            g.addColorStop(1, 'transparent');
+        }
 
         ctx.fillStyle = g;
-        ctx.fillRect(x - r, y - r, r * 2, r * 2);
+        ctx.fillRect(0, 0, 512, 512);
     }
 
-    // 2. Sharp Veins (High Contrast)
-    ctx.strokeStyle = veinColor;
+    // 2. Sharp Veins - HIGH CONTRAST
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
-    const numVeins = 8;
+    const numVeins = 10;
     for (let i = 0; i < numVeins; i++) {
-        // High visibility for dark marble
-        ctx.globalAlpha = isDark ? 0.6 : (0.2 + Math.random() * 0.3);
-        ctx.lineWidth = 2 + Math.random() * 4;
+        // White veins on black, dark on light
+        ctx.strokeStyle = isDark ? '#aaaaaa' : '#404040';
+        ctx.globalAlpha = isDark ? 0.8 : 0.4;
+        ctx.lineWidth = 1 + Math.random() * 3;
 
         let x = Math.random() * 512;
         let y = Math.random() * 512;
@@ -91,12 +93,12 @@ export function createMarbleTexture(isDark) {
         ctx.beginPath();
         ctx.moveTo(x, y);
 
-        const segments = 5 + Math.random() * 5;
+        const segments = 4 + Math.random() * 4;
         for (let j = 0; j < segments; j++) {
-            const dx = (Math.random() - 0.5) * 300;
-            const dy = (Math.random() - 0.5) * 300;
-            const cp1x = x + (Math.random() - 0.5) * 100;
-            const cp1y = y + (Math.random() - 0.5) * 100;
+            const dx = (Math.random() - 0.5) * 250;
+            const dy = (Math.random() - 0.5) * 250;
+            const cp1x = x + (Math.random() - 0.5) * 80;
+            const cp1y = y + (Math.random() - 0.5) * 80;
 
             x += dx;
             y += dy;

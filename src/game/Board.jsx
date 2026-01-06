@@ -98,10 +98,10 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                     <meshPhysicalMaterial
                         color={color}
                         map={texture}
-                        roughness={0.5} // Matte Stone with visible texture
+                        roughness={0.8}
                         metalness={0.1}
-                        clearcoat={0.1} // Subtle gloss for texture pop
-                        clearcoatRoughness={0.5}
+                        clearcoat={0.0}
+                        clearcoatRoughness={1.0}
                         bumpMap={texture}
                         bumpScale={0.005} // Subtle texture
                     />
