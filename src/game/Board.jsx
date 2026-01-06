@@ -91,10 +91,10 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 {isClassic ? (
                     <meshPhysicalMaterial
                         color={color}
-                        roughness={0.5}
+                        roughness={0.7} // Matte
                         metalness={0.0}
-                        clearcoat={0.3}
-                        clearcoatRoughness={0.4}
+                        clearcoat={0.0} // No gloss
+                        clearcoatRoughness={1.0}
                     />
                 ) : (
                     <meshStandardMaterial color={color} roughness={0.7} />
@@ -203,9 +203,9 @@ function Border({ theme }) {
             {isClassic ? (
                 <meshPhysicalMaterial
                     color="#2a1b15"
-                    roughness={0.6}
+                    roughness={0.8}
                     metalness={0.0}
-                    clearcoat={0.1}
+                    clearcoat={0.0}
                 />
             ) : (
                 <meshStandardMaterial color="#2d2d2d" roughness={0.9} />

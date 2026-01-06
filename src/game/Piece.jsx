@@ -6,11 +6,10 @@ export default function Piece({ type, color, position, onClick, theme }) {
     const isClassic = theme === 'classic';
 
     const materialProps = isClassic ? {
-        color: isWhite ? '#e6c9a8' : '#3f2e22', // Slightly richer for classic
-        roughness: 0.4,
-        metalness: 0.1,
-        clearcoat: 0.3,
-        clearcoatRoughness: 0.25,
+        color: isWhite ? '#e6c9a8' : '#4a332a', // Matte wood colors
+        roughness: 0.65, // Natural matte wood
+        metalness: 0.0,
+        clearcoat: 0.0,  // No plastic reflection
     } : {
         color: isWhite ? '#eecfa1' : '#3d2b1f', // Original matte colors
         roughness: 0.7,
@@ -121,28 +120,53 @@ function MinimalPiece({ type, materialProps }) {
 function ClassicPiece({ type, materialProps }) {
     const points = useMemo(() => getPieceProfile(type), [type]);
 
+    // Construct Knight Shape (Horse Head)
+    const knightShape = useMemo(() => {
+        if (type !== 'n') return null;
+        const s = new THREE.Shape();
+        s.moveTo(0, 0);       // Neck base center
+        s.lineTo(0.15, 0);    // Neck base front
+        s.quadraticCurveTo(0.25, 0.2, 0.28, 0.4); // Chest/Neck curve
+        s.lineTo(0.3, 0.45);  // Jaw start
+        s.lineTo(0.32, 0.35); // Chin
+        s.lineTo(0.35, 0.38); // Snout tip bottom
+        s.lineTo(0.35, 0.45); // Snout tip top
+        s.lineTo(0.25, 0.6);  // Forehead
+        s.lineTo(0.2, 0.7);   // Ears front
+        s.lineTo(0.15, 0.65); // Ears top
+        s.lineTo(0.1, 0.75);  // Mane top
+        s.quadraticCurveTo(-0.1, 0.4, -0.15, 0); // Mane back curve
+        s.lineTo(0, 0); // Close
+        return s;
+    }, [type]);
+
     if (type === 'n') {
-        // Knight is special (non-symmetric)
+        const extrudeSettings = {
+            steps: 2,
+            depth: 0.15, // Thickness of the horse
+            bevelEnabled: true,
+            bevelThickness: 0.02,
+            bevelSize: 0.02,
+            bevelSegments: 3
+        };
+
         return (
             <group position={[0, 0, 0]}>
-                {/* Base */}
-                <mesh castShadow receiveShadow position={[0, 0.15, 0]}>
-                    <cylinderGeometry args={[0.25, 0.3, 0.3, 16]} />
-                    <meshPhysicalMaterial {...materialProps} />
+                {/* Standard Round Base */}
+                <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
+                    <cylinderGeometry args={[0.28, 0.32, 0.2, 32]} />
+                    <meshStandardMaterial {...materialProps} />
                 </mesh>
-                {/* Body/Head */}
-                <group position={[0, 0.3, 0]}>
-                    {/* Neck */}
-                    <mesh castShadow receiveShadow position={[0, 0.1, 0]} rotation={[0.2, 0, 0]}>
-                        <boxGeometry args={[0.2, 0.4, 0.15]} />
-                        <meshPhysicalMaterial {...materialProps} />
-                    </mesh>
-                    {/* Head/Snout */}
-                    <mesh castShadow receiveShadow position={[0, 0.35, 0.1]}>
-                        <boxGeometry args={[0.18, 0.2, 0.35]} />
-                        <meshPhysicalMaterial {...materialProps} />
-                    </mesh>
-                </group>
+                <mesh castShadow receiveShadow position={[0, 0.25, 0]}>
+                    <cylinderGeometry args={[0.22, 0.25, 0.1, 32]} />
+                    <meshStandardMaterial {...materialProps} />
+                </mesh>
+
+                {/* Extruded Horse Head */}
+                <mesh castShadow receiveShadow position={[0, 0.3, -0.075]} rotation={[0, 0, 0]}>
+                    <extrudeGeometry args={[knightShape, extrudeSettings]} />
+                    <meshStandardMaterial {...materialProps} />
+                </mesh>
             </group>
         );
     }
@@ -150,21 +174,21 @@ function ClassicPiece({ type, materialProps }) {
     return (
         <group position={[0, 0, 0]}>
             <mesh castShadow receiveShadow>
-                <latheGeometry args={[points, 16]} />
-                <meshPhysicalMaterial {...materialProps} />
+                <latheGeometry args={[points, 32]} /> {/* Higher resolution lathe */}
+                <meshStandardMaterial {...materialProps} />
             </mesh>
             {/* Special tops for King/Queen/Bishop */}
             {type === 'k' && (
-                <mesh position={[0, 0.95, 0]} castShadow receiveShadow>
-                    <boxGeometry args={[0.1, 0.1, 0.03]} /> {/* Cross */}
-                    <meshPhysicalMaterial {...materialProps} />
-                </mesh>
-            )}
-            {type === 'k' && (
-                <mesh position={[0, 0.95, 0]} castShadow receiveShadow>
-                    <boxGeometry args={[0.03, 0.1, 0.1]} /> {/* Cross */}
-                    <meshPhysicalMaterial {...materialProps} />
-                </mesh>
+                <group position={[0, 0.95, 0]}>
+                    <mesh castShadow receiveShadow position={[0, 0.05, 0]}>
+                        <boxGeometry args={[0.04, 0.15, 0.04]} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                    <mesh castShadow receiveShadow position={[0, 0.08, 0]}>
+                        <boxGeometry args={[0.12, 0.04, 0.04]} />
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
+                </group>
             )}
         </group>
     );

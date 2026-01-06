@@ -32,7 +32,7 @@ export default function UIOverlay() {
     // Local state for difficulty
     const [selectedDifficulty, setSelectedDifficulty] = useState('standard');
     // Local state for theme
-    const [selectedTheme, setSelectedTheme] = useState('classic');
+    const [selectedTheme, setSelectedTheme] = useState('minimal');
 
     if (gamePhase === 'start') {
         return (

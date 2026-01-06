@@ -280,9 +280,9 @@ export default function GameStateProvider({ children }) {
     }, []);
 
     // Game Theme: 'minimal' or 'classic'
-    const [theme, setTheme] = useState('classic');
+    const [theme, setTheme] = useState('minimal');
 
-    const startGame = useCallback((startColor, difficulty = 'standard', gameTheme = 'classic') => {
+    const startGame = useCallback((startColor, difficulty = 'standard', gameTheme = 'minimal') => {
         initializeAudio(); // Important: call this on user interaction
 
         const newGame = new Chess();
