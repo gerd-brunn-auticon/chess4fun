@@ -1,17 +1,26 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import { createWoodTexture } from './WoodTexture';
 
 export default function Piece({ type, color, position, onClick, theme }) {
     const isWhite = color === 'w';
     const isClassic = theme === 'classic';
 
+    // Generate wood texture for classic mode
+    const woodTexture = useMemo(() => {
+        if (isClassic) return createWoodTexture(!isWhite); // Invert logic: Dark wood for black
+        return null;
+    }, [isClassic, isWhite]);
+
     const materialProps = isClassic ? {
-        color: isWhite ? '#e6c9a8' : '#4a332a', // Matte wood colors
-        roughness: 0.65, // Natural matte wood
+        color: isWhite ? '#e6c9a8' : '#6d4c41', // Base color
+        map: woodTexture, // Procedural grain
+        roughness: 0.6,
         metalness: 0.0,
-        clearcoat: 0.0,  // No plastic reflection
+        bumpMap: woodTexture, // Use grain for slight bump
+        bumpScale: 0.02
     } : {
-        color: isWhite ? '#eecfa1' : '#3d2b1f', // Original matte colors
+        color: isWhite ? '#eecfa1' : '#3d2b1f',
         roughness: 0.7,
         metalness: 0.0
     };
@@ -120,30 +129,30 @@ function MinimalPiece({ type, materialProps }) {
 function ClassicPiece({ type, materialProps }) {
     const points = useMemo(() => getPieceProfile(type), [type]);
 
-    // Construct Knight Shape (Horse Head)
+    // Construct Knight Shape (Horse Head) - improved upright posture
     const knightShape = useMemo(() => {
         if (type !== 'n') return null;
         const s = new THREE.Shape();
-        s.moveTo(0, 0);       // Neck base center
-        s.lineTo(0.15, 0);    // Neck base front
-        s.quadraticCurveTo(0.25, 0.2, 0.28, 0.4); // Chest/Neck curve
-        s.lineTo(0.3, 0.45);  // Jaw start
-        s.lineTo(0.32, 0.35); // Chin
-        s.lineTo(0.35, 0.38); // Snout tip bottom
-        s.lineTo(0.35, 0.45); // Snout tip top
-        s.lineTo(0.25, 0.6);  // Forehead
-        s.lineTo(0.2, 0.7);   // Ears front
-        s.lineTo(0.15, 0.65); // Ears top
-        s.lineTo(0.1, 0.75);  // Mane top
-        s.quadraticCurveTo(-0.1, 0.4, -0.15, 0); // Mane back curve
-        s.lineTo(0, 0); // Close
+        // Upright Profile
+        s.moveTo(0, 0);
+        s.lineTo(0.2, 0);
+        s.lineTo(0.25, 0.3);  // Chest
+        s.lineTo(0.28, 0.5);  // Throttle
+        s.lineTo(0.35, 0.4);  // Jaw
+        s.lineTo(0.38, 0.42); // Snout bottom
+        s.lineTo(0.38, 0.52); // Snout tip
+        s.lineTo(0.25, 0.65); // Forehead
+        s.lineTo(0.22, 0.75); // Ear front
+        s.lineTo(0.15, 0.72); // Ear top
+        s.lineTo(0.1, 0.65);  // Mane top
+        s.quadraticCurveTo(-0.05, 0.3, 0, 0); // Mane back
         return s;
     }, [type]);
 
     if (type === 'n') {
         const extrudeSettings = {
             steps: 2,
-            depth: 0.15, // Thickness of the horse
+            depth: 0.12,
             bevelEnabled: true,
             bevelThickness: 0.02,
             bevelSize: 0.02,
@@ -163,7 +172,7 @@ function ClassicPiece({ type, materialProps }) {
                 </mesh>
 
                 {/* Extruded Horse Head */}
-                <mesh castShadow receiveShadow position={[0, 0.3, -0.075]} rotation={[0, 0, 0]}>
+                <mesh castShadow receiveShadow position={[0, 0.3, -0.06]} rotation={[0, 0, 0]}>
                     <extrudeGeometry args={[knightShape, extrudeSettings]} />
                     <meshStandardMaterial {...materialProps} />
                 </mesh>
@@ -177,15 +186,15 @@ function ClassicPiece({ type, materialProps }) {
                 <latheGeometry args={[points, 32]} /> {/* Higher resolution lathe */}
                 <meshStandardMaterial {...materialProps} />
             </mesh>
-            {/* Special tops for King/Queen/Bishop */}
+            {/* Special tops for King */}
             {type === 'k' && (
                 <group position={[0, 0.95, 0]}>
-                    <mesh castShadow receiveShadow position={[0, 0.05, 0]}>
-                        <boxGeometry args={[0.04, 0.15, 0.04]} />
+                    <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
+                        <boxGeometry args={[0.06, 0.25, 0.06]} /> {/* Taller Cross V */}
                         <meshStandardMaterial {...materialProps} />
                     </mesh>
-                    <mesh castShadow receiveShadow position={[0, 0.08, 0]}>
-                        <boxGeometry args={[0.12, 0.04, 0.04]} />
+                    <mesh castShadow receiveShadow position={[0, 0.15, 0]}>
+                        <boxGeometry args={[0.18, 0.06, 0.06]} /> {/* Wider Cross H */}
                         <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
@@ -206,27 +215,29 @@ function getPieceProfile(type) {
             p(0.15, 0.45); p(0.15, 0.55); // Collar
             p(0.18, 0.6); p(0.12, 0.75); p(0, 0.8); // Head
             break;
-        case 'r': // Rook
-            p(0, 0); p(0.3, 0); p(0.3, 0.1); p(0.25, 0.15); // Base
-            p(0.22, 0.2); p(0.22, 0.5); // Body
-            p(0.28, 0.6); p(0.28, 0.7); p(0.2, 0.75); p(0.25, 0.9); p(0, 0.9); // Top
+        case 'r': // Rook - Distinctive
+            p(0, 0); p(0.32, 0); p(0.32, 0.1); p(0.28, 0.15); // Wide Base
+            p(0.25, 0.2); p(0.22, 0.5); // Body
+            p(0.3, 0.6); p(0.3, 0.8); // Head Base
+            p(0.32, 0.9); p(0.2, 0.9); p(0.2, 0.8); p(0, 0.8); // Top battlements
             break;
-        case 'b': // Bishop
-            p(0, 0); p(0.28, 0); p(0.28, 0.05); p(0.22, 0.15); // Base
-            p(0.15, 0.3); p(0.12, 0.5); // Body
-            p(0.18, 0.6); p(0.15, 0.85); p(0, 0.9); // Top
+        case 'b': // Bishop - Distinctive
+            p(0, 0); p(0.3, 0); p(0.3, 0.08); p(0.22, 0.15); // Base
+            p(0.14, 0.3); p(0.12, 0.55); // Tall Body
+            p(0.2, 0.6); p(0.22, 0.65); // Collar
+            p(0.18, 0.85); p(0.05, 0.92); p(0, 0.95); // Hat
             break;
         case 'q': // Queen
-            p(0, 0); p(0.32, 0); p(0.32, 0.05); p(0.25, 0.15); // Base
+            p(0, 0); p(0.34, 0); p(0.34, 0.05); p(0.25, 0.15); // Base
             p(0.16, 0.3); p(0.14, 0.6); // Body
-            p(0.22, 0.7); p(0.25, 0.85); // Crown Base
-            p(0.3, 0.95); p(0, 0.95); // Crown Top
+            p(0.22, 0.7); p(0.28, 0.85); // Crown Base
+            p(0.32, 0.95); p(0, 0.95); // Crown Top
             break;
         case 'k': // King
-            p(0, 0); p(0.32, 0); p(0.32, 0.05); p(0.25, 0.15); // Base
-            p(0.18, 0.3); p(0.16, 0.6); // Body
-            p(0.25, 0.7); p(0.25, 0.85); // Crown Base
-            p(0.1, 0.9); p(0, 0.9); // Top Platform
+            p(0, 0); p(0.35, 0); p(0.35, 0.05); p(0.28, 0.15); // Base
+            p(0.2, 0.3); p(0.18, 0.6); // Body
+            p(0.28, 0.7); p(0.28, 0.85); // Crown Base
+            p(0.1, 0.95); p(0, 0.95); // Top Platform
             break;
         default: break;
     }

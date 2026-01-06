@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Text } from '@react-three/drei';
+import { createWoodTexture } from './WoodTexture';
 
 export default function Board({ onSquareClick, selectedSquare, validMoves, lastMove, theme }) {
     const squares = [];
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const isClassic = theme === 'classic';
+
+    // Generate textures for classic mode only
+    const lightWood = useMemo(() => isClassic ? createWoodTexture(false) : null, [isClassic]);
+    const darkWood = useMemo(() => isClassic ? createWoodTexture(true) : null, [isClassic]);
 
     // Create 64 squares
     // Board coordinate system: 
@@ -41,6 +47,7 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
                     isLastMove={isLastMove}
                     onClick={() => onSquareClick(squareName)}
                     theme={theme}
+                    woodTexture={isDark ? darkWood : lightWood}
                 />
             );
         }
@@ -50,19 +57,19 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
         <group>
             {squares}
             <BoardLabels files={files} />
-            <Border theme={theme} />
+            <Border theme={theme} woodTexture={darkWood} />
         </group>
     );
 }
 
-function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick, theme }) {
+function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick, theme, woodTexture }) {
     const isClassic = theme === 'classic';
 
     // Colors
     // Minimal: Standard Brown/Beige (Back to original style)
     // Classic: Richer Wood Tones
     // Original colors (approx): Dark #5c4033, Light #deb887
-    const darkColor = isClassic ? '#5d4037' : '#5c4033';
+    const darkColor = isClassic ? '#6d4c41' : '#5c4033';
     const lightColor = isClassic ? '#e6c9a8' : '#deb887';
 
     // Highlight colors
@@ -91,10 +98,12 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 {isClassic ? (
                     <meshPhysicalMaterial
                         color={color}
-                        roughness={0.7} // Matte
+                        map={woodTexture}
+                        roughness={0.8} // Natural matte wood
                         metalness={0.0}
-                        clearcoat={0.0} // No gloss
-                        clearcoatRoughness={1.0}
+                        clearcoat={0.0}
+                        bumpMap={woodTexture}
+                        bumpScale={0.02}
                     />
                 ) : (
                     <meshStandardMaterial color={color} roughness={0.7} />
@@ -195,17 +204,20 @@ function BoardLabels({ files }) {
     return <>{labels}</>;
 }
 
-function Border({ theme }) {
+function Border({ theme, woodTexture }) {
     const isClassic = theme === 'classic';
     return (
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
             {isClassic ? (
                 <meshPhysicalMaterial
-                    color="#2a1b15"
-                    roughness={0.8}
+                    color="#4a332a"
+                    map={woodTexture}
+                    roughness={0.9}
                     metalness={0.0}
                     clearcoat={0.0}
+                    bumpMap={woodTexture}
+                    bumpScale={0.02}
                 />
             ) : (
                 <meshStandardMaterial color="#2d2d2d" roughness={0.9} />

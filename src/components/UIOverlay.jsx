@@ -89,14 +89,17 @@ export default function UIOverlay() {
     const isWhiteTurn = turn === 'w';
 
     const historyPairs = [];
-    for (let i = 0; i < history.length; i += 2) {
-        const wMove = history[i];
-        const bMove = history[i + 1];
+    const formatMove = (m) => {
+        if (!m) return '';
+        const isCapture = m.flags.includes('c') || m.flags.includes('e'); // capture or en passant
+        return `${m.from} ${isCapture ? 'x' : '→'} ${m.to}`;
+    };
 
+    for (let i = 0; i < history.length; i += 2) {
         historyPairs.push({
             num: Math.floor(i / 2) + 1,
-            white: wMove ? `${wMove.from} → ${wMove.to}` : '',
-            black: bMove ? `${bMove.from} → ${bMove.to}` : ''
+            white: formatMove(history[i]),
+            black: formatMove(history[i + 1])
         });
     }
 
