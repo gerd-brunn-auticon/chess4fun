@@ -86,10 +86,10 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 <boxGeometry args={[0.98, 0.2, 0.98]} />
                 <meshPhysicalMaterial
                     color={color}
-                    roughness={0.2}
-                    metalness={0.05}
-                    clearcoat={1.0}
-                    clearcoatRoughness={0.15}
+                    roughness={0.5}
+                    metalness={0.0}
+                    clearcoat={0.3}
+                    clearcoatRoughness={0.4}
                 />
             </mesh>
 
@@ -192,11 +192,10 @@ function Border() {
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
             <meshPhysicalMaterial
-                color="#3e2723"
-                roughness={0.3}
-                metalness={0.1}
-                clearcoat={1.0}
-                clearcoatRoughness={0.2}
+                color="#2a1b15"
+                roughness={0.6}
+                metalness={0.0}
+                clearcoat={0.1}
             />
         </mesh>
     );

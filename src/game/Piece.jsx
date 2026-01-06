@@ -3,12 +3,11 @@ import React from 'react';
 export default function Piece({ type, color, position, onClick }) {
     const isWhite = color === 'w';
     const materialProps = {
-        color: isWhite ? '#f0d9b5' : '#3f2e22', // Maple vs Dark Walnut
-        roughness: 0.2,   // Wood texture roughness
-        metalness: 0.1,
-        clearcoat: 1.0,   // High gloss lacquer
-        clearcoatRoughness: 0.1, // Very smooth polish
-        reflectivity: 1.0,
+        color: isWhite ? '#eebfa1' : '#3f2e22', // Slightly warmer maple / Dark Walnut
+        roughness: 0.4,   // Less glossy, more natural wood
+        metalness: 0.0,   // Wood is non-metallic
+        clearcoat: 0.3,   // Subtle polish, not high gloss
+        clearcoatRoughness: 0.25,
     };
 
     return (
