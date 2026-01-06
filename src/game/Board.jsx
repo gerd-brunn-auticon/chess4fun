@@ -67,9 +67,9 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
 
     // Colors
     // Minimal: Standard Brown/Beige 
-    // Classic: Marble Tones (Dark Grey / Cream)
-    const darkColor = isClassic ? '#000000' : '#5c4033';
-    const lightColor = isClassic ? '#f0f0f0' : '#deb887';
+    // Classic: Use white to let texture show through (texture provides the color)
+    const darkColor = isClassic ? '#ffffff' : '#5c4033';
+    const lightColor = isClassic ? '#ffffff' : '#deb887';
 
     // Highlight colors
     const darkSelected = '#b8860b';
