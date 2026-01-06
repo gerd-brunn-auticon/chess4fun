@@ -93,7 +93,7 @@ export default function GameStateProvider({ children }) {
                                     // Update all state
                                     setFen(currentGame.fen());
                                     setTurn(currentGame.turn());
-                                    setHistory(currentGame.history());
+                                    setHistory(currentGame.history({ verbose: true }));
 
                                     // Check game status
                                     if (currentGame.isGameOver()) {
@@ -171,7 +171,7 @@ export default function GameStateProvider({ children }) {
                             if (result) {
                                 setFen(game.fen());
                                 setTurn(game.turn());
-                                setHistory(game.history());
+                                setHistory(game.history({ verbose: true }));
 
                                 // Check game status
                                 if (game.isGameOver()) {
@@ -200,7 +200,7 @@ export default function GameStateProvider({ children }) {
     const updateGameState = useCallback(() => {
         setFen(game.fen());
         setTurn(game.turn());
-        setHistory(game.history());
+        setHistory(game.history({ verbose: true }));
 
         if (game.isGameOver()) {
             setIsGameOver(true);

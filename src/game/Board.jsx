@@ -56,8 +56,9 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
 
 function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick }) {
     // High contrast colors for visibility
-    const darkColor = '#5c4033';    // Dark wood brown
-    const lightColor = '#deb887';   // Light wood / burlywood
+    // High contrast colors for visibility - Wood Tones
+    const darkColor = '#5d4037';    // Darker Walnut
+    const lightColor = '#e6c9a8';   // Warm Maple
 
     // Highlight colors that preserve dark/light distinction
     const darkSelected = '#b8860b';   // Dark goldenrod
@@ -83,7 +84,7 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 position={[0, -0.1, 0]}
             >
                 <boxGeometry args={[0.98, 0.2, 0.98]} />
-                <meshStandardMaterial color={color} roughness={0.7} />
+                <meshStandardMaterial color={color} roughness={0.5} metalness={0.1} />
             </mesh>
 
             {/* Valid Move Indicator - Ring for captures, dot for normal moves */}
@@ -184,7 +185,7 @@ function Border() {
     return (
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
-            <meshStandardMaterial color="#2d2d2d" roughness={0.9} />
+            <meshStandardMaterial color="#3e2723" roughness={0.4} metalness={0.2} />
         </mesh>
     );
 }

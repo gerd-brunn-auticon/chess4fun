@@ -3,9 +3,9 @@ import React from 'react';
 export default function Piece({ type, color, position, onClick }) {
     const isWhite = color === 'w';
     const materialProps = {
-        color: isWhite ? '#eecfa1' : '#3d2b1f',
-        roughness: 0.5,
-        metalness: 0.1
+        color: isWhite ? '#f0d9b5' : '#4b3600', // Maple vs Dark Walnut
+        roughness: 0.35, // Polished wood
+        metalness: 0.2, // Slight sheen
     };
 
     return (

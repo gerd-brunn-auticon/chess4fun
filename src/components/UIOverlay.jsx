@@ -70,10 +70,13 @@ export default function UIOverlay() {
 
     const historyPairs = [];
     for (let i = 0; i < history.length; i += 2) {
+        const wMove = history[i];
+        const bMove = history[i + 1];
+
         historyPairs.push({
             num: Math.floor(i / 2) + 1,
-            white: history[i],
-            black: history[i + 1] || ''
+            white: wMove ? `${wMove.from} → ${wMove.to}` : '',
+            black: bMove ? `${bMove.from} → ${bMove.to}` : ''
         });
     }
 
