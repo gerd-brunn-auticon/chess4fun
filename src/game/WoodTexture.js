@@ -53,9 +53,9 @@ export function createMarbleTexture(isDark) {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Marble Colors (Black/White or Cream/Dark)
-    const baseColor = isDark ? '#050505' : '#f5f5f0';
-    const veinColor = isDark ? '#e0e0e0' : '#404040';
+    // Marble Colors (Deep Black / Off-White)
+    const baseColor = isDark ? '#000000' : '#f5f5f0';
+    const veinColor = isDark ? '#ffffff' : '#404040';
 
     ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 512, 512);
@@ -67,22 +67,23 @@ export function createMarbleTexture(isDark) {
         const r = 50 + Math.random() * 150;
 
         const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)');
+        g.addColorStop(0, isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.03)');
         g.addColorStop(1, 'transparent');
 
         ctx.fillStyle = g;
         ctx.fillRect(x - r, y - r, r * 2, r * 2);
     }
 
-    // 2. Sharp Veins
+    // 2. Sharp Veins (High Contrast)
     ctx.strokeStyle = veinColor;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
-    const numVeins = 5;
+    const numVeins = 8;
     for (let i = 0; i < numVeins; i++) {
-        ctx.globalAlpha = 0.2 + Math.random() * 0.3;
-        ctx.lineWidth = 1 + Math.random() * 2;
+        // High visibility for dark marble
+        ctx.globalAlpha = isDark ? 0.6 : (0.2 + Math.random() * 0.3);
+        ctx.lineWidth = 2 + Math.random() * 4;
 
         let x = Math.random() * 512;
         let y = Math.random() * 512;

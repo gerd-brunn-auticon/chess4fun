@@ -190,7 +190,7 @@ function ClassicPiece({ type, materialProps, color }) {
         // So White Knights should face -Z.
         // Black Knights should face +Z.
 
-        const yRotation = isWhite ? -Math.PI / 2 : Math.PI * 1.5;
+        const yRotation = isWhite ? Math.PI / 2 : Math.PI * 1.5;
 
         return (
             <group position={[0, 0, 0]}>
