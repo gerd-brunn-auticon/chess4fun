@@ -68,7 +68,7 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
     // Colors
     // Minimal: Standard Brown/Beige 
     // Classic: Marble Tones (Dark Grey / Cream)
-    const darkColor = isClassic ? '#404040' : '#5c4033';
+    const darkColor = isClassic ? '#151515' : '#5c4033';
     const lightColor = isClassic ? '#f0f0f0' : '#deb887';
 
     // Highlight colors
@@ -98,7 +98,7 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                     <meshPhysicalMaterial
                         color={color}
                         map={texture}
-                        roughness={0.6} // Honed Stone
+                        roughness={0.8} // Deep Matte Stone
                         metalness={0.1}
                         clearcoat={0.0} // No Reflective Glare
                         clearcoatRoughness={1.0}
@@ -211,9 +211,9 @@ function Border({ theme, texture }) {
             <boxGeometry args={[9.5, 0.3, 9.5]} />
             {isClassic ? (
                 <meshPhysicalMaterial
-                    color="#202020"
+                    color="#151515"
                     map={texture}
-                    roughness={0.8}
+                    roughness={0.9}
                     metalness={0.1}
                     clearcoat={0.0}
                 />

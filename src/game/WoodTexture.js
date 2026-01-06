@@ -54,7 +54,7 @@ export function createMarbleTexture(isDark) {
     const ctx = canvas.getContext('2d');
 
     // Marble Colors (Black/White or Cream/Dark)
-    const baseColor = isDark ? '#202020' : '#f5f5f0';
+    const baseColor = isDark ? '#050505' : '#f5f5f0';
     const veinColor = isDark ? '#e0e0e0' : '#404040';
 
     ctx.fillStyle = baseColor;

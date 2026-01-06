@@ -28,8 +28,8 @@ function Experience() {
     return (
         <>
             <Environment preset="studio" blur={1} />
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} intensity={1} castShadow />
+            <ambientLight intensity={1.5} />
+            <pointLight position={[0, 15, 0]} intensity={0.5} castShadow />
             <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
             <group rotation={[0, isBoardRotated ? Math.PI : 0, 0]}>
                 <GameScene />
