@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from '@react-three/drei';
 
-export default function Board({ onSquareClick, selectedSquare, validMoves, lastMove }) {
+export default function Board({ onSquareClick, selectedSquare, validMoves, lastMove, theme }) {
     const squares = [];
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
@@ -40,6 +40,7 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
                     isValidMove={isValidMove}
                     isLastMove={isLastMove}
                     onClick={() => onSquareClick(squareName)}
+                    theme={theme}
                 />
             );
         }
@@ -49,25 +50,28 @@ export default function Board({ onSquareClick, selectedSquare, validMoves, lastM
         <group>
             {squares}
             <BoardLabels files={files} />
-            <Border />
+            <Border theme={theme} />
         </group>
     );
 }
 
-function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick }) {
-    // High contrast colors for visibility
-    // High contrast colors for visibility - Wood Tones
-    const darkColor = '#5d4037';    // Darker Walnut
-    const lightColor = '#e6c9a8';   // Warm Maple
+function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick, theme }) {
+    const isClassic = theme === 'classic';
 
-    // Highlight colors that preserve dark/light distinction
-    const darkSelected = '#b8860b';   // Dark goldenrod
-    const lightSelected = '#ffd700';  // Gold
-    const darkLastMove = '#6b8e23';   // Olive drab (darker green)
-    const lightLastMove = '#9acd32';  // Yellow green (lighter green)
+    // Colors
+    // Minimal: Standard Brown/Beige (Back to original style)
+    // Classic: Richer Wood Tones
+    // Original colors (approx): Dark #5c4033, Light #deb887
+    const darkColor = isClassic ? '#5d4037' : '#5c4033';
+    const lightColor = isClassic ? '#e6c9a8' : '#deb887';
+
+    // Highlight colors
+    const darkSelected = '#b8860b';
+    const lightSelected = '#ffd700';
+    const darkLastMove = '#6b8e23';
+    const lightLastMove = '#9acd32';
 
     let color;
-
     if (isSelected) {
         color = isDark ? darkSelected : lightSelected;
     } else if (isLastMove) {
@@ -84,13 +88,17 @@ function Square({ position, isDark, isSelected, isValidMove, isLastMove, onClick
                 position={[0, -0.1, 0]}
             >
                 <boxGeometry args={[0.98, 0.2, 0.98]} />
-                <meshPhysicalMaterial
-                    color={color}
-                    roughness={0.5}
-                    metalness={0.0}
-                    clearcoat={0.3}
-                    clearcoatRoughness={0.4}
-                />
+                {isClassic ? (
+                    <meshPhysicalMaterial
+                        color={color}
+                        roughness={0.5}
+                        metalness={0.0}
+                        clearcoat={0.3}
+                        clearcoatRoughness={0.4}
+                    />
+                ) : (
+                    <meshStandardMaterial color={color} roughness={0.7} />
+                )}
             </mesh>
 
             {/* Valid Move Indicator - Ring for captures, dot for normal moves */}
@@ -187,16 +195,21 @@ function BoardLabels({ files }) {
     return <>{labels}</>;
 }
 
-function Border() {
+function Border({ theme }) {
+    const isClassic = theme === 'classic';
     return (
         <mesh position={[0, -0.25, 0]} receiveShadow>
             <boxGeometry args={[9.5, 0.3, 9.5]} />
-            <meshPhysicalMaterial
-                color="#2a1b15"
-                roughness={0.6}
-                metalness={0.0}
-                clearcoat={0.1}
-            />
+            {isClassic ? (
+                <meshPhysicalMaterial
+                    color="#2a1b15"
+                    roughness={0.6}
+                    metalness={0.0}
+                    clearcoat={0.1}
+                />
+            ) : (
+                <meshStandardMaterial color="#2d2d2d" roughness={0.9} />
+            )}
         </mesh>
     );
 }

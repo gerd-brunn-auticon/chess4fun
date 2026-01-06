@@ -1,34 +1,46 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import * as THREE from 'three';
 
-export default function Piece({ type, color, position, onClick }) {
+export default function Piece({ type, color, position, onClick, theme }) {
     const isWhite = color === 'w';
-    const materialProps = {
-        color: isWhite ? '#eebfa1' : '#3f2e22', // Slightly warmer maple / Dark Walnut
-        roughness: 0.4,   // Less glossy, more natural wood
-        metalness: 0.0,   // Wood is non-metallic
-        clearcoat: 0.3,   // Subtle polish, not high gloss
+    const isClassic = theme === 'classic';
+
+    const materialProps = isClassic ? {
+        color: isWhite ? '#e6c9a8' : '#3f2e22', // Slightly richer for classic
+        roughness: 0.4,
+        metalness: 0.1,
+        clearcoat: 0.3,
         clearcoatRoughness: 0.25,
+    } : {
+        color: isWhite ? '#eecfa1' : '#3d2b1f', // Original matte colors
+        roughness: 0.7,
+        metalness: 0.0
     };
 
     return (
         <group position={position} onClick={(e) => { e.stopPropagation(); onClick(); }}>
-            <PieceGeometry type={type} materialProps={materialProps} />
+            {isClassic ? (
+                <ClassicPiece type={type} materialProps={materialProps} />
+            ) : (
+                <MinimalPiece type={type} materialProps={materialProps} />
+            )}
         </group>
     );
 }
 
-function PieceGeometry({ type, materialProps }) {
+// --- Old "Minimal" Geometry ---
+function MinimalPiece({ type, materialProps }) {
     switch (type) {
         case 'p': // Pawn
             return (
                 <group position={[0, 0.3, 0]}>
                     <mesh castShadow receiveShadow position={[0, -0.1, 0]}>
                         <cylinderGeometry args={[0.2, 0.3, 0.4, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.25, 0]}>
                         <sphereGeometry args={[0.15, 16, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
             );
@@ -36,8 +48,8 @@ function PieceGeometry({ type, materialProps }) {
             return (
                 <group position={[0, 0.4, 0]}>
                     <mesh castShadow receiveShadow>
-                        <cylinderGeometry args={[0.25, 0.3, 0.8, 4]} />{/* Blocky base */}
-                        <meshPhysicalMaterial {...materialProps} />
+                        <cylinderGeometry args={[0.25, 0.3, 0.8, 4]} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
             );
@@ -46,12 +58,12 @@ function PieceGeometry({ type, materialProps }) {
                 <group position={[0, 0.4, 0]}>
                     <mesh castShadow receiveShadow position={[0, -0.2, 0]}>
                         <cylinderGeometry args={[0.25, 0.3, 0.4, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.2, 0]}>
                         <boxGeometry args={[0.2, 0.4, 0.4]} />
-                        <meshPhysicalMaterial {...materialProps} />
-                    </mesh> {/* Abstract Horse Head */}
+                        <meshStandardMaterial {...materialProps} />
+                    </mesh>
                 </group>
             )
         case 'b': // Bishop
@@ -59,11 +71,11 @@ function PieceGeometry({ type, materialProps }) {
                 <group position={[0, 0.45, 0]}>
                     <mesh castShadow receiveShadow>
                         <cylinderGeometry args={[0.1, 0.3, 0.9, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.5, 0]}>
                         <coneGeometry args={[0.15, 0.3, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
             )
@@ -72,11 +84,11 @@ function PieceGeometry({ type, materialProps }) {
                 <group position={[0, 0.55, 0]}>
                     <mesh castShadow receiveShadow>
                         <cylinderGeometry args={[0.2, 0.35, 1.1, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.6, 0]}>
                         <sphereGeometry args={[0.2, 16, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
             )
@@ -85,22 +97,114 @@ function PieceGeometry({ type, materialProps }) {
                 <group position={[0, 0.6, 0]}>
                     <mesh castShadow receiveShadow>
                         <cylinderGeometry args={[0.2, 0.35, 1.2, 16]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.7, 0]}>
                         <boxGeometry args={[0.15, 0.15, 0.15]} />
-                        <meshPhysicalMaterial {...materialProps} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.85, 0]}>
-                        <boxGeometry args={[0.05, 0.15, 0.05]} /> {/* Cross V */}
-                        <meshPhysicalMaterial {...materialProps} />
+                        <boxGeometry args={[0.05, 0.15, 0.05]} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                     <mesh castShadow receiveShadow position={[0, 0.85, 0]}>
-                        <boxGeometry args={[0.15, 0.05, 0.05]} /> {/* Cross H */}
-                        <meshPhysicalMaterial {...materialProps} />
+                        <boxGeometry args={[0.15, 0.05, 0.05]} />
+                        <meshStandardMaterial {...materialProps} />
                     </mesh>
                 </group>
             )
         default: return null;
     }
+}
+
+// --- New "Classic" Lathe Geometry ---
+function ClassicPiece({ type, materialProps }) {
+    const points = useMemo(() => getPieceProfile(type), [type]);
+
+    if (type === 'n') {
+        // Knight is special (non-symmetric)
+        return (
+            <group position={[0, 0, 0]}>
+                {/* Base */}
+                <mesh castShadow receiveShadow position={[0, 0.15, 0]}>
+                    <cylinderGeometry args={[0.25, 0.3, 0.3, 16]} />
+                    <meshPhysicalMaterial {...materialProps} />
+                </mesh>
+                {/* Body/Head */}
+                <group position={[0, 0.3, 0]}>
+                    {/* Neck */}
+                    <mesh castShadow receiveShadow position={[0, 0.1, 0]} rotation={[0.2, 0, 0]}>
+                        <boxGeometry args={[0.2, 0.4, 0.15]} />
+                        <meshPhysicalMaterial {...materialProps} />
+                    </mesh>
+                    {/* Head/Snout */}
+                    <mesh castShadow receiveShadow position={[0, 0.35, 0.1]}>
+                        <boxGeometry args={[0.18, 0.2, 0.35]} />
+                        <meshPhysicalMaterial {...materialProps} />
+                    </mesh>
+                </group>
+            </group>
+        );
+    }
+
+    return (
+        <group position={[0, 0, 0]}>
+            <mesh castShadow receiveShadow>
+                <latheGeometry args={[points, 16]} />
+                <meshPhysicalMaterial {...materialProps} />
+            </mesh>
+            {/* Special tops for King/Queen/Bishop */}
+            {type === 'k' && (
+                <mesh position={[0, 0.95, 0]} castShadow receiveShadow>
+                    <boxGeometry args={[0.1, 0.1, 0.03]} /> {/* Cross */}
+                    <meshPhysicalMaterial {...materialProps} />
+                </mesh>
+            )}
+            {type === 'k' && (
+                <mesh position={[0, 0.95, 0]} castShadow receiveShadow>
+                    <boxGeometry args={[0.03, 0.1, 0.1]} /> {/* Cross */}
+                    <meshPhysicalMaterial {...materialProps} />
+                </mesh>
+            )}
+        </group>
+    );
+}
+
+function getPieceProfile(type) {
+    const points = [];
+    // Helper to add point
+    const p = (x, y) => points.push(new THREE.Vector2(x, y));
+
+    switch (type) {
+        case 'p': // Pawn
+            p(0, 0); p(0.26, 0); p(0.26, 0.05); p(0.2, 0.1); // Base
+            p(0.12, 0.2); p(0.08, 0.4); // Stem
+            p(0.15, 0.45); p(0.15, 0.55); // Collar
+            p(0.18, 0.6); p(0.12, 0.75); p(0, 0.8); // Head
+            break;
+        case 'r': // Rook
+            p(0, 0); p(0.3, 0); p(0.3, 0.1); p(0.25, 0.15); // Base
+            p(0.22, 0.2); p(0.22, 0.5); // Body
+            p(0.28, 0.6); p(0.28, 0.7); p(0.2, 0.75); p(0.25, 0.9); p(0, 0.9); // Top
+            break;
+        case 'b': // Bishop
+            p(0, 0); p(0.28, 0); p(0.28, 0.05); p(0.22, 0.15); // Base
+            p(0.15, 0.3); p(0.12, 0.5); // Body
+            p(0.18, 0.6); p(0.15, 0.85); p(0, 0.9); // Top
+            break;
+        case 'q': // Queen
+            p(0, 0); p(0.32, 0); p(0.32, 0.05); p(0.25, 0.15); // Base
+            p(0.16, 0.3); p(0.14, 0.6); // Body
+            p(0.22, 0.7); p(0.25, 0.85); // Crown Base
+            p(0.3, 0.95); p(0, 0.95); // Crown Top
+            break;
+        case 'k': // King
+            p(0, 0); p(0.32, 0); p(0.32, 0.05); p(0.25, 0.15); // Base
+            p(0.18, 0.3); p(0.16, 0.6); // Body
+            p(0.25, 0.7); p(0.25, 0.85); // Crown Base
+            p(0.1, 0.9); p(0, 0.9); // Top Platform
+            break;
+        default: break;
+    }
+    return points;
 }

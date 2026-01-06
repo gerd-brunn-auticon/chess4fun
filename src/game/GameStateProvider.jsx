@@ -279,7 +279,10 @@ export default function GameStateProvider({ children }) {
         }
     }, []);
 
-    const startGame = useCallback((startColor, difficulty = 'standard') => {
+    // Game Theme: 'minimal' or 'classic'
+    const [theme, setTheme] = useState('classic');
+
+    const startGame = useCallback((startColor, difficulty = 'standard', gameTheme = 'classic') => {
         initializeAudio(); // Important: call this on user interaction
 
         const newGame = new Chess();
@@ -300,7 +303,9 @@ export default function GameStateProvider({ children }) {
         setElapsedTime(0);
 
         // Set AI Difficulty
+        // Set AI Difficulty & Theme
         setAiDifficulty(difficulty);
+        setTheme(gameTheme);
         if (stockfish.current) {
             const skillLevel = difficulty === 'master' ? 20 : 5; // 5 is good for casual, 20 is max
             console.log(`Setting Stockfish Skill Level to ${skillLevel} (${difficulty})`);
@@ -351,7 +356,8 @@ export default function GameStateProvider({ children }) {
         isBoardRotated,
         isAiThinking,
         aiMoveDescription,
-        elapsedTime
+        elapsedTime,
+        theme
     };
 
     return (

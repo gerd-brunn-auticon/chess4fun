@@ -4,7 +4,7 @@ import Board from './Board';
 import Piece from './Piece';
 
 export default function GameScene() {
-    const { game, fen, turn, makeMove, setPendingPromotion, gameStatus } = useGame();
+    const { game, fen, turn, makeMove, setPendingPromotion, gameStatus, theme } = useGame();
     const [selectedSquare, setSelectedSquare] = useState(null);
 
     // Derive Pieces from current board state
@@ -101,6 +101,7 @@ export default function GameScene() {
                 selectedSquare={selectedSquare}
                 validMoves={validMoves}
                 lastMove={lastMove}
+                theme={theme}
             />
             {pieces.map((p) => (
                 <Piece
@@ -109,6 +110,7 @@ export default function GameScene() {
                     color={p.color}
                     position={p.position}
                     onClick={() => handleSquareClick(p.squareName)}
+                    theme={theme}
                 />
             ))}
         </group>

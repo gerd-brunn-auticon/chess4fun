@@ -31,6 +31,8 @@ export default function UIOverlay() {
 
     // Local state for difficulty
     const [selectedDifficulty, setSelectedDifficulty] = useState('standard');
+    // Local state for theme
+    const [selectedTheme, setSelectedTheme] = useState('classic');
 
     if (gamePhase === 'start') {
         return (
@@ -56,10 +58,28 @@ export default function UIOverlay() {
                         </div>
                     </div>
 
+                    <div className="difficulty-section" style={{ marginBottom: 20 }}>
+                        <p>Select Style</p>
+                        <div className="difficulty-toggle">
+                            <button
+                                className={selectedTheme === 'minimal' ? 'active' : ''}
+                                onClick={() => setSelectedTheme('minimal')}
+                            >
+                                Minimalist
+                            </button>
+                            <button
+                                className={selectedTheme === 'classic' ? 'active' : ''}
+                                onClick={() => setSelectedTheme('classic')}
+                            >
+                                Classic Wood
+                            </button>
+                        </div>
+                    </div>
+
                     <p>Choose your side</p>
                     <div className="start-buttons">
-                        <button onClick={() => startGame('w', selectedDifficulty)}>Play as White</button>
-                        <button onClick={() => startGame('b', selectedDifficulty)}>Play as Black</button>
+                        <button onClick={() => startGame('w', selectedDifficulty, selectedTheme)}>Play as White</button>
+                        <button onClick={() => startGame('b', selectedDifficulty, selectedTheme)}>Play as Black</button>
                     </div>
                 </div>
             </div>
